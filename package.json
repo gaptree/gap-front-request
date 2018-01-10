@@ -9,7 +9,14 @@
     "babel-core": "^6.26.0",
     "babel-jest": "^22.0.4",
     "babel-preset-env": "^1.6.1",
-    "gap-front-fun": "^1.0.4",
     "regenerator-runtime": "^0.11.1"
+  },
+  "dependencies": {
+    "gap-front-fun": "^1.0.5"
+  },
+  "scripts": {
+    "test": "npm run jest && npm run eslint",
+    "jest": "jest",
+    "eslint": "eslint ."
   }
 }

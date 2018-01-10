@@ -663,7 +663,7 @@ for-own@^0.1.4:
   dependencies:
     for-in "^1.0.1"
 
-gap-front-fun@^1.0.4:
+gap-front-fun@^1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/gap-front-fun/-/gap-front-fun-1.0.5.tgz#127c3faab872866a394132f3336a1941f9e84170"
 

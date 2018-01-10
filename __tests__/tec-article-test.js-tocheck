@@ -1,0 +1,49 @@
+import {Request} from '../Request.js';
+
+test('html', async () => {
+    const request = new Request();
+    request.withCredentials = true;
+
+    try {
+        const html = await request.ajax({
+            url: 'http://www.tec-article.a'
+        });
+
+        console.log(html);
+    } catch (error) {
+        console.log(error);
+    }
+});
+
+test('json', async () => {
+    const request = new Request();
+    request.withCredentials = true;
+
+    // request.addHeader('Authorization', 'Bearer AbCdEf123456');
+    // Error: Response for preflight has invalid HTTP status code 500
+    // no idea Router::dispatcher
+
+    try {
+        const data = await request.postJson(
+            'http://www.tec-article.a/open/header',
+            {
+                accessToken: 'ABcdEf2314231'
+            }
+        );
+        console.log(data);
+    } catch (error) {
+        console.log(error);
+    }
+});
+
+
+test('www.crp.moon/login', async () => {
+    const request = new Request();
+    request.withCredentials = true;
+
+    const html = await request.ajax({
+        url: 'http://www.crp.moon'
+    });
+
+    console.log(html);
+});

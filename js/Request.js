@@ -11,17 +11,21 @@ import {createXhr} from './createXhr.js';
 // https://enable-cors.org/server_nginx.html
 
 export class Request {
-    constructor () {
+    constructor() {
         this.header = {};
     }
 
-    getXhr () {
+    getXhr() {
         if (this.xhr) {
             return this.xhr;
         }
 
         this.xhr = createXhr();
         return this.xhr;
+    }
+
+    getStatus() {
+        return this.getXhr().status;
     }
 
     ajax (opts) {
@@ -32,6 +36,34 @@ export class Request {
                 dataType = opts.dataType || 'html',
                 xhr = this.getXhr();
 
+            const handleSuccess = (dataType) => {
+                if (dataType === 'html') {
+                    resolve(xhr.responseText);
+                } else if (dataType === 'json') {
+                    resolve(JSON.parse(xhr.responseText));
+                } else {
+                    reject({
+                        status: xhr.status,
+                        error: 'unkown dataType ' + dataType,
+                        responseText: xhr.responseText
+                    });
+                }
+            };
+
+            const handleFailed = (dataType) => {
+                if (dataType === 'html') {
+                    reject(xhr.responseText);
+                } else if (dataType === 'json') {
+                    reject(JSON.parse(xhr.responseText));
+                } else {
+                    reject({
+                        status: xhr.status,
+                        error: 'error http status',
+                        responseText: xhr.responseText
+                    });
+                }
+            };
+
             if (this.withCredentials) {
                 xhr.withCredentials = true;
             }
@@ -40,39 +72,11 @@ export class Request {
                 if (xhr.readyState !== XMLHttpRequest.DONE) {
                     return;
                 }
-
-                if (xhr.status !== 200) {
-                    reject({
-                        status: xhr.status,
-                        error: 'error http status',
-                        responseText: xhr.responseText
-                    });
-                    return;
+                if (xhr.status === 200) {
+                    handleSuccess(dataType);
+                } else {
+                    handleFailed(dataType);
                 }
-
-                if (dataType === 'html') {
-                    resolve(xhr.responseText);
-                    return;
-                }
-                
-                if (dataType === 'json') {
-                    try {
-                        resolve(JSON.parse(xhr.responseText));
-                    } catch (error) {
-                        reject({
-                            status: xhr.status,
-                            error: error,
-                            responseText: xhr.responseText
-                        });
-                    }
-                    return;
-                }
-
-                reject({
-                    status: xhr.status,
-                    error: 'unkown dataType ' + dataType,
-                    responseText: xhr.responseText
-                });
             };
 
             xhr.onerror = () => {

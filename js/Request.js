@@ -33,7 +33,7 @@ export class Request {
             const method = (opts.method || 'get').toUpperCase(),
                 async = opts.async === false ? false : true,
                 url = opts.url || '',
-                dataType = opts.dataType || 'html',
+                optDataType = opts.dataType || 'html',
                 xhr = this.getXhr();
 
             const handleSuccess = (dataType) => {
@@ -73,9 +73,9 @@ export class Request {
                     return;
                 }
                 if (xhr.status === 200) {
-                    handleSuccess(dataType);
+                    handleSuccess(optDataType);
                 } else {
-                    handleFailed(dataType);
+                    handleFailed(optDataType);
                 }
             };
 

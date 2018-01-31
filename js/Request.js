@@ -64,7 +64,7 @@ export class Request {
                 }
             };
 
-            if (this.withCredentials) {
+            if (this.withCredentials && xhr.withCredentials !== true) {
                 xhr.withCredentials = true;
             }
 

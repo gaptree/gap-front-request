@@ -1,4 +1,4 @@
-import {toFormData} from 'gap-front-fun';
+import {toFormData} from 'gap-front-form';
 import {createXhr} from './createXhr.js';
 
 // withCredentials

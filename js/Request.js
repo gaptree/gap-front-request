@@ -1,5 +1,6 @@
 import {toFormData} from 'gap-front-form';
 import {createXhr} from './createXhr.js';
+import {buildSortedQuery} from './buildSortedQuery.js';
 
 // withCredentials
 // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials
@@ -98,22 +99,12 @@ export class Request {
         });
     }
 
-    buildQuery(args) {
-        var k, arr = [];
-        for (k in args) {
-            if (args.hasOwnProperty(k)) {
-                arr.push(k + '=' + args[k]);
-            }
-        }
-        return arr.join('&');
-    }
-
     addHeader (key, val) {
         this.header[key] = val;
     }
 
     getJson (url, send) {
-        url += '?' + this.buildQuery(send);
+        url += '?' + buildSortedQuery(send);
 
         return this.ajax(
             {

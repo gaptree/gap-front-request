@@ -1,75 +1,77 @@
 import {Request} from './Request';
 
 export class RequestQueue {
-    constructor(opts) {
-        this.srcUrl = opts.srcUrl || '';
-        this.send = opts.send || {};
-        this.queryName = opts.queryName || 'q';
-        this.querying = false;
-        this.currentQuery = false;
-        this.sentQuery = false;
-        //this.receivedQuery = false;
-        this.interval = opts.interval || 500;
+    constructor(url, opts) {
+        const defaultOpts = {
+            withCredentials: true,
+            interval: 500,
+            method: 'post',
+            dataType: 'json'
+        };
 
+        this.url = url;
+
+        this.sentArgs = {};
+        this.currentArgs = {};
+
+        this.opts = Object.assign({}, defaultOpts, opts);
         this.request = new Request();
-
-        if (!this.srcUrl) {
-            throw 'srcUrl cannot be empty';
-        }
     }
 
-    queryJson(query) {
-        this.currentQuery = query;
-        // console.log('currentQuery:' + this.currentQuery);
+    isEqual(oneObj, twoObj) {
+        for (let index in oneObj) {
+            if (oneObj[index] !== twoObj[index]) {
+                return false;
+            }
+        }
 
+        return true;
+    }
+
+    clear() {
+        this.sentArgs = {};
+    }
+
+    ajax(args) {
+        this.currentArgs = args;
         if (this.querying) {
             return this;
         }
-
-        if (this.sentQuery === this.currentQuery) {
+        if (this.isEqual(this.sentArgs, this.currentArgs)) {
             return this;
         }
-
         this.querying = true;
-        this.send[this.queryName] = query;
-        this.sentQuery = query;
-
-        // console.log('sentQuery:' + this.sentQuery);
+        this.sentArgs = args;
 
         this.request.ajax({
-            method: this.method,
-            url: this.srcUrl,
-            dataType: 'json',
-            send: this.send,
-            withCredentials: true
+            url: this.url,
+            send: args,
+            method: this.opts.method,
+            dataType: this.opts.dataType,
+            withCredentials: this.opts.withCredentials
         }).then(data => {
-            //console.log(data);
             this.callLoad(data);
 
             setTimeout(() => {
                 this.querying = false;
-                this.queryJson(this.currentQuery);
+                this.ajax(this.currentArgs);
             }, this.interval);
         }).catch(err => {
             this.querying = false;
             this.callErr(err);
         });
-
-        return this;
     }
 
-    clear() {
-        this.sentQuery = null;
+    getJson(args) {
+        this.opts.method = 'get';
+        this.opts.dataType = 'json';
+        return this.ajax(args);
     }
 
-    queryPostJson(query) {
-        this.method = 'post';
-        return this.queryJson(query);
-    }
-
-    queryGetJson(query) {
-        this.method = 'get';
-        return this.queryJson(query);
+    postJson(args) {
+        this.opts.method = 'post';
+        this.opts.dataType = 'json';
+        return this.ajax(args);
     }
 
     onLoad(callback) {
